@@ -130,10 +130,7 @@ map ::
   (a -> b)
   -> List a
   -> List b
--- map _ Nil = Nil
--- map f (a:.as) = (f a):.(map f as)
-map f = foldLeft (\acc e -> (f e):.acc) Nil 
-
+map f  = foldRight (\e acc -> (f e) :. acc) Nil
 
 -- | Return elements satisfying the given predicate.
 --
@@ -149,7 +146,7 @@ filter ::
   (a -> Bool)
   -> List a
   -> List a
-filter f = foldLeft (\acc a -> if (f a) then a :. acc else acc) Nil 
+filter f = foldRight (\a acc -> if (f a) then a :. acc else acc) Nil 
 
 -- | Append two lists to a new list.
 --
@@ -307,8 +304,7 @@ lengthGT4  = lengthGTn 4
 reverse ::
   List a
   -> List a
-reverse =
-  error "todo: Course.List#reverse"
+reverse = foldLeft (flip (:.)) Nil
 
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
@@ -336,8 +332,8 @@ produce f x = x :. produce f (f x)
 notReverse ::
   List a
   -> List a
-notReverse =
-  error "todo: Is it even possible?"
+notReverse = id
+  
 
 ---- End of list exercises
 
