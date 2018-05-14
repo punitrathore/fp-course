@@ -240,8 +240,8 @@ flattenAgain = flatMap id
 seqOptional ::
   List (Optional a)
   -> Optional (List a)
-seqOptional =
-  error "todo: Course.List#seqOptional"
+seqOptional Nil = A.pure Nil
+seqOptional (a :. as) = (:.) A.<$> a A.<*> seqOptional as
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -263,9 +263,18 @@ find ::
   (a -> Bool)
   -> List a
   -> Optional a
-find =
-  error "todo: Course.List#find"
-
+find f l = case filter f l of
+             Nil -> Empty
+             (a :. _) -> Full a
+  
+lengthGTn :: (Ord t1, Num t1) => t1 -> List t -> Bool
+lengthGTn n Nil  
+  | n > 0 = False
+  | n == 0 = True
+lengthGTn n (_ :. as) 
+  | n == 0 = True
+  | otherwise = lengthGTn (n - 1) as
+lengthGTn _ Nil = False    
 -- | Determine if the length of the given list is greater than 4.
 --
 -- >>> lengthGT4 (1 :. 3 :. 5 :. Nil)
@@ -282,8 +291,7 @@ find =
 lengthGT4 ::
   List a
   -> Bool
-lengthGT4 =
-  error "todo: Course.List#lengthGT4"
+lengthGT4  = lengthGTn 4
 
 -- | Reverse a list.
 --
