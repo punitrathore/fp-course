@@ -133,8 +133,6 @@ sequenceOptional =
     pureOptional (a' : as')) as) a)
   (pureOptional [])
 
-----
-
 data IntReader a =
   IntReader (Int -> a)
 
@@ -449,3 +447,7 @@ class BindAndPure f where
     a
     -> f a
     
+sequence :: (BindAndPure f) => [f a] -> f [a]
+-- sequence = foldr (\a as -> (bind (\a' -> bind (\as' -> pure(a':as')) as) a)) (pure [])
+sequence [] = pure []
+sequence (x:xs) = (\x' -> ((\xs' -> pure(x':xs')) `bind` (sequence xs))) `bind` x
