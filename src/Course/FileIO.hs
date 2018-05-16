@@ -95,19 +95,16 @@ printFile fp c = do
 printFiles ::
   List (FilePath, Chars)
   -> IO ()
-printFiles l = do
-  sequence $ (<$>) (\(fp, ch) -> printFile fp ch) l
-  return ()
-  
+printFiles l =
+  void . sequence $ (<$>) (\(fp, ch) -> printFile fp ch) l
+
 
 -- Given a file name, return (file name and file contents).
 -- Use @readFile@.
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
-getFile fp = do
-  ch <- readFile fp
-  return (fp, ch)
+getFile fp = lift2 (<$>) (,) readFile fp
   
 
 -- Given a list of file names, return list of (file name and file contents).
@@ -115,7 +112,7 @@ getFile fp = do
 getFiles ::
   List FilePath
   -> IO (List (FilePath, Chars))
-getFiles lst = sequence $ (<$>) getFile lst
+getFiles = sequence . (<$>) getFile
   
 
 -- Given a file name, read it and for each line in that file, read and print contents of each.
@@ -125,8 +122,7 @@ run ::
   -> IO ()
 run fp = do
   (_, ch) <- getFile fp
-  let fileNames = lines ch
-  files <- getFiles fileNames
+  files <- getFiles (lines ch)
   printFiles files
   return ()
   
@@ -137,7 +133,7 @@ main ::
 main = do
   fps <- getArgs
   case fps of
-    Nil -> return ()
+    Nil -> putStrLn "You need to pass a filename"
     (fp :. _) -> run fp
 
 ----
